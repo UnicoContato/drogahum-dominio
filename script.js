@@ -1,80 +1,91 @@
-document.addEventListener('DOMContentLoaded', () => {
-    
-    const header = document.getElementById('main-header');
-    let lastScroll = 0;
+const header = document.getElementById('header');
+const menuBtn = document.getElementById('menu-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+const privacyBtn = document.getElementById('privacy-btn');
+const privacyModal = document.getElementById('privacy-modal');
+const closeModal = document.getElementById('close-modal');
+const modalBackdrop = document.getElementById('modal-backdrop');
 
-    window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
-        
-        if (currentScroll <= 0) {
-            header.classList.remove('-translate-y-full', 'shadow-md');
-            header.classList.add('shadow-none');
-        } else if (currentScroll > lastScroll && !header.classList.contains('-translate-y-full')) {
-            header.classList.add('-translate-y-full');
-        } else if (currentScroll < lastScroll && header.classList.contains('-translate-y-full')) {
-            header.classList.remove('-translate-y-full');
-            header.classList.add('shadow-md');
-        }
-        lastScroll = currentScroll;
-    });
+let lastScrollY = window.scrollY;
+let ticking = false;
 
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileLinks = mobileMenu.querySelectorAll('a');
+function updateHeader() {
+  const currentScrollY = window.scrollY;
+  if (currentScrollY > lastScrollY && currentScrollY > 80) {
+    header.style.transform = 'translateY(-100%)';
+    header.style.transition = 'transform 0.4s cubic-bezier(0.16,1,0.3,1)';
+  } else {
+    header.style.transform = 'translateY(0)';
+    header.style.transition = 'transform 0.4s cubic-bezier(0.16,1,0.3,1)';
+  }
+  lastScrollY = currentScrollY;
+  ticking = false;
+}
 
-    menuBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-    });
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    requestAnimationFrame(updateHeader);
+    ticking = true;
+  }
+});
 
-    mobileLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            mobileMenu.classList.add('hidden');
-        });
-    });
+menuBtn.addEventListener('click', () => {
+  mobileMenu.classList.toggle('hidden');
+});
 
-    const revealElements = document.querySelectorAll('.reveal-section');
+document.querySelectorAll('.mobile-nav-link').forEach(link => {
+  link.addEventListener('click', () => {
+    mobileMenu.classList.add('hidden');
+  });
+});
 
-    const revealOnScroll = () => {
-        const windowHeight = window.innerHeight;
-        const elementVisible = 100;
+function openModal() {
+  privacyModal.classList.remove('hidden');
+  privacyModal.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+}
 
-        revealElements.forEach((element) => {
-            const elementTop = element.getBoundingClientRect().top;
-            if (elementTop < windowHeight - elementVisible) {
-                element.classList.add('active');
-            }
-        });
-    };
+function closeModalFn() {
+  privacyModal.classList.add('hidden');
+  privacyModal.classList.remove('flex');
+  document.body.style.overflow = '';
+}
 
-    window.addEventListener('scroll', revealOnScroll);
-    revealOnScroll();
+privacyBtn.addEventListener('click', openModal);
+closeModal.addEventListener('click', closeModalFn);
+modalBackdrop.addEventListener('click', closeModalFn);
 
-    const modal = document.getElementById('privacy-modal');
-    const btnOpen = document.getElementById('privacy-btn');
-    const btnClose = document.getElementById('close-modal');
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModalFn();
+});
 
-    btnOpen.addEventListener('click', (e) => {
-        e.preventDefault();
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    });
+const observerOptions = {
+  threshold: 0.15,
+  rootMargin: '0px 0px -50px 0px'
+};
 
-    const closeModal = () => {
-        modal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    };
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, observerOptions);
 
-    btnClose.addEventListener('click', closeModal);
+document.querySelectorAll('.reveal-left, .reveal-right').forEach(el => {
+  revealObserver.observe(el);
+});
 
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeModal();
-        }
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-            closeModal();
-        }
-    });
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    const targetId = this.getAttribute('href');
+    const target = document.querySelector(targetId);
+    if (target) {
+      e.preventDefault();
+      const offset = header.offsetHeight + 16;
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  });
 });
