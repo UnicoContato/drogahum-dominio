@@ -52,8 +52,28 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-5KGSP2HV");
+    </script>
   </head>
   <body class="font-body bg-gray-50 text-gray-900 scroll-smooth">
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-5KGSP2HV"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
     <header
       id="header"
       class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
@@ -689,7 +709,9 @@
             <strong class="text-gray-900">drogahum.com.br</strong> trata as
             informações dos visitantes.
           </p>
-          <h4 class="font-display font-700 text-gray-900">1. Coleta de Dados</h4>
+          <h4 class="font-display font-700 text-gray-900">
+            1. Coleta de Dados
+          </h4>
           <p>
             Este site é de caráter exclusivamente institucional e informativo.
             Não realizamos coleta, armazenamento ou processamento de dados
